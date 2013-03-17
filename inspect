@@ -210,7 +210,7 @@ namespace inspect
 	value (Type& value)
 	{
 		std::ostringstream ss(std::ostringstream::out);
-		ss << "(" << type<Type>() << ") " << value;
+		ss << "(" << type<Type>() << ") 0x" << std::hex << (intptr_t) value;
 
 		return ss.str();
 	}
