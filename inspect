@@ -90,7 +90,10 @@ namespace inspect
 		{
 			static std::ostream& s;
 			static Type const& t;
-			static bool const value = sizeof(test(s << t)) == sizeof(yes);
+
+			enum : bool {
+				value = sizeof(test(s << t)) == sizeof(yes)
+			};
 		};
 	}
 
