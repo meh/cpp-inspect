@@ -19,7 +19,7 @@
 
 namespace inspect
 {
-#	if defined(__clang__) || defined(__GNUC__)
+#	if defined(__clang__) || defined(__GNUC__) && !defined(NO_DEMANGLE)
 #		include <cxxabi.h>
 
 		template <typename Type>
@@ -44,7 +44,7 @@ namespace inspect
 
 			return result;
 		}
-#	elif defined(_MSC_VER)
+#	elif defined(_MSC_VER) && !defined(NO_DEMANGLE)
 #		include <Windows.h>
 #		include <Dbghelp.h>
 
