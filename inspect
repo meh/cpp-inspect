@@ -97,59 +97,103 @@ namespace inspect
 	struct has_cout : _has_cout::has_cout<Type>
 	{};
 
+	template <typename Type, class Enable = void>
+	struct has_to_string_method;
+
 	template <typename Type>
-	struct has_to_string_method
+	struct has_to_string_method<Type, typename std::enable_if<std::is_class<Type>::value>::type>
 	{
 		typedef char no[1];
 		typedef char yes[2];
 
-		template <typename C>
-		static typename std::enable_if<std::is_same<decltype(&C::to_string),
-																	 std::string(C::*)(void)>::value, yes&>::type
-		test (decltype(&C::to_string));
+		template <typename T, T>
+		struct type_check;
 
-		template <typename C>
+		template <class T>
+		struct to_string
+		{
+			typedef std::string (T::*function)(void);
+		};
+
+		template <class T>
+		static yes& test (type_check<typename to_string<T>::function, &T::to_string>*);
+
+		template <class T>
 		static no& test (...);
 
-		static const bool value = sizeof(test<Type>(0)) == sizeof(yes);
+		enum : bool {
+			value = sizeof(test<Type>(0)) == sizeof(yes)
+		};
 	};
 
 	template <typename Type>
-	struct has_inspect_method
+	struct has_to_string_method<Type, typename std::enable_if<!std::is_class<Type>::value>::type>
+	{
+		enum : bool {
+			value = false
+		};
+	};
+
+	template <typename Type, class Enable = void>
+	struct has_inspect_method;
+
+	template <typename Type>
+	struct has_inspect_method<Type, typename std::enable_if<std::is_class<Type>::value>::type>
 	{
 		typedef char no[1];
 		typedef char yes[2];
 
-		template <typename C>
-		static typename std::enable_if<std::is_same<decltype(&C::inspect),
-																	 std::string(C::*)(void)>::value, yes&>::type
-		test (decltype(&C::inspect));
+		template <typename T, T>
+		struct type_check;
 
-		template <typename C>
+		template <class T>
+		struct inspect
+		{
+			typedef std::string (T::*function)(void);
+		};
+
+		template <class T>
+		static yes& test (type_check<typename inspect<T>::function, &T::inspect>*);
+
+		template <class T>
 		static no& test (...);
 
-		static const bool value = sizeof(test<Type>(0)) == sizeof(yes);
+		enum : bool {
+			value = sizeof(test<Type>(0)) == sizeof(yes)
+		};
+	};
+
+	template <typename Type>
+	struct has_inspect_method<Type, typename std::enable_if<!std::is_class<Type>::value>::type>
+	{
+		enum : bool {
+			value = false
+		};
 	};
 
 	template <typename Type>
 	struct is_string
 	{
-		static const bool value = std::is_same<Type, std::string>::value ||
-		                          std::is_same<Type, std::wstring>::value ||
-		                          std::is_same<Type, std::u16string>::value ||
-		                          std::is_same<Type, std::u32string>::value;
+		enum : bool {
+			value = std::is_same<Type, std::string>::value ||
+		                             std::is_same<Type, std::wstring>::value ||
+		                             std::is_same<Type, std::u16string>::value ||
+		                             std::is_same<Type, std::u32string>::value
+		};
 	};
 
 	template <typename Type>
 	struct is_raw_string
 	{
-		static const bool value = (std::is_array<Type>::value &&
-			std::is_same<typename std::remove_const<
-				typename std::remove_extent<Type>::type>::type, char>::value) ||
-
-			(std::is_pointer<Type>::value &&
+		enum : bool {
+			value = (std::is_array<Type>::value &&
 				std::is_same<typename std::remove_const<
-					typename std::remove_pointer<Type>::type>::type, char>::value);
+					typename std::remove_extent<Type>::type>::type, char>::value) ||
+
+				(std::is_pointer<Type>::value &&
+					std::is_same<typename std::remove_const<
+						typename std::remove_pointer<Type>::type>::type, char>::value)
+		};
 	};
 
 	template <typename Type>
