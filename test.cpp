@@ -29,6 +29,9 @@ class wat
 		}
 };
 
+union omg
+{};
+
 enum class derp
 {
   lol, wut, omg
@@ -67,6 +70,9 @@ main (int argc, char* argv[])
 
 	wat c;
 	std::cout << inspect::value(c) << std::endl;
+
+	omg d;
+	std::cout << inspect::value(d) << std::endl;
 
   std::cout << inspect::value(23) << std::endl;
   std::cout << inspect::value(derp::omg) << std::endl;
