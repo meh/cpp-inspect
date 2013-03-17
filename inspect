@@ -47,16 +47,6 @@ namespace inspect
 		}
 #	endif
 
-	template <typename Type>
-	inline
-	std::string
-	type (Type& value)
-	{
-		(void) value;
-
-		return type<Type>();
-	}
-
 	namespace _has_cout
 	{
 		typedef char no[1];
