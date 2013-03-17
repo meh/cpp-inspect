@@ -44,6 +44,20 @@ namespace inspect
 
 			return result;
 		}
+#	elif defined(_MSC_VER)
+#		include <Windows.h>
+#		include <Dbghelp.h>
+
+		template <typename Type>
+		inline
+		std::string
+		type (void)
+		{
+			char demangled[4096];
+			UnDecorateSymbolName(typeid(Type).name(), demangled, 4096, UNDNAME_COMPLETE);
+
+			return demangled;
+		}
 #	else
 		template <typename Type>
 		inline
