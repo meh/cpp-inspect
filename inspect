@@ -19,7 +19,7 @@
 
 namespace inspect
 {
-#	ifndef NO_DEMANGLE
+#	if defined(__clang__) || defined(__GNUC__)
 #		include <cxxabi.h>
 
 		template <typename Type>
@@ -34,6 +34,13 @@ namespace inspect
 
 			result = demangled;
 			free(demangled);
+
+			if (std::is_enum<Type>::value) {
+				result = "enum " + result;
+			}
+			else if (std::is_union<Type>::value) {
+				result = "union " + result;
+			}
 
 			return result;
 		}
@@ -201,7 +208,7 @@ namespace inspect
 	value (Type value)
 	{
 		std::ostringstream ss(std::ostringstream::out);
-		ss << "#<enum " << type<Type>() << ": " << value << ">";
+		ss << "#<" << type<Type>() << ": " << value << ">";
 
 		return ss.str();
 	}
@@ -213,7 +220,7 @@ namespace inspect
 	value (Type value)
 	{
 		std::ostringstream ss(std::ostringstream::out);
-		ss << "#<enum " << type<Type>() << ": " <<
+		ss << "#<" << type<Type>() << ": " <<
 			static_cast<typename std::underlying_type<Type>::type>(value) << ">";
 
 		return ss.str();
@@ -226,7 +233,7 @@ namespace inspect
 	value (Type& value)
 	{
 		std::ostringstream ss(std::ostringstream::out);
-		ss << "#<union " << type<Type>() << ": " << value << ">";
+		ss << "#<" << type<Type>() << ": " << value << ">";
 
 		return ss.str();
 	}
@@ -238,7 +245,7 @@ namespace inspect
 	value (Type& value)
 	{
 		std::ostringstream ss(std::ostringstream::out);
-		ss << "#<union " << type<Type>() << ":" << &value << ">";
+		ss << "#<" << type<Type>() << ":" << &value << ">";
 
 		return ss.str();
 	}
