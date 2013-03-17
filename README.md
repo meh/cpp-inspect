@@ -7,7 +7,7 @@ If you define `std::string inspect (void)` as method in your class, it will use
 the whole output when inspecting.
 
 If you define `std::string to_string (void)` as method in your class, it will use
-it's output in this manner `#<*type*: *output*>`.
+its output in this manner `#<*type*: *output*>`.
 
 If you define `std::ostream& operator << (std::ostream& on, *type* value)` for your
 class, it will act as it were a `to_string` method.
