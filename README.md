@@ -32,9 +32,11 @@ true
 
 Type name demangling
 --------------------
-By default it demangles type names using the `cxxabi.h` header, it's not available
-everywhere, so if you don't have it make sure to define `NO_DEMANGLE`, the type
-names will be worse, but well, such is life.
+By default it demangles type names using the `cxxabi.h` header, it's not
+available everywhere, so if you don't have it or don't want it make sure to
+define `NO_DEMANGLE`, the type names will be worse, but well, such is life.
+
+On MSVC it uses `dbghelp.lib` and `Dbghelp.h`.
 
 License
 -------
