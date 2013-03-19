@@ -83,7 +83,7 @@ main (int argc, char* argv[])
 	float* duh = (float*) 342;
 	std::cout << inspect::value(duh) << std::endl;
 
-	std::cout << inspect::value("lol") << std::endl;
+	std::cout << inspect::value("\tlol\n\x01\"ß") << std::endl;
 
 	std::cout << inspect::value(true) << std::endl;
 
