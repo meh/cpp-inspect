@@ -19,14 +19,15 @@ test.cpp output
 ---------------
 ```
 "34"
-#<foo:0x7fff076d3e20>
+#<foo:0x7fffebb50360>
 #<bar: dabbah>
 #<wat: I like trains>
+#<union omg:0x7fffebb50330>
 23
 #<enum derp: omg>
 [[1, 2], [3, 4]]
 (float*) 0x156
-"lol"
+"\tlol\n\x01\"\xc3\x9f"
 true
 ```
 
