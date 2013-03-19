@@ -12,6 +12,7 @@
 #define _INSPECT_H
 
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <type_traits>
 #include <typeinfo>
@@ -206,6 +207,31 @@ namespace inspect
 		};
 	};
 
+	inline
+	void
+	inspect_character (std::ostringstream& ss, unsigned char ch)
+	{
+		if (std::isprint(ch)) {
+			if (ch == '\\' || ch == '"') {
+				ss << "\\";
+			}
+
+			ss << (char) ch;
+		}
+		else {
+			switch (ch) {
+				case '\t': ss << "\\t"; break;
+				case '\n': ss << "\\n"; break;
+				case '\v': ss << "\\v"; break;
+				case '\f': ss << "\\f"; break;
+				case '\r': ss << "\\r"; break;
+
+				default:
+					ss << "\\x" << std::setfill('0') << std::setw(2) << std::hex << (int) ch;
+			}
+		}
+	}
+
 	template <typename Type>
 	inline
 	typename std::enable_if<is_string<Type>::value, Type>::type
@@ -215,11 +241,7 @@ namespace inspect
 
 		ss << "\"";
 		for (auto ch : value) {
-			if (ch == '\\') {
-				ss << "\\";
-			}
-
-			ss << ch;
+			inspect_character(ss, ch);
 		}
 		ss << "\"";
 
@@ -235,11 +257,7 @@ namespace inspect
 
 		ss << "\"";
 		for (char const* string = value; *string; string++) {
-			if (*string == '\\') {
-				ss << "\\";
-			}
-
-			ss << *string;
+			inspect_character(ss, *string);
 		}
 		ss << "\"";
 
