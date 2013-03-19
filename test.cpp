@@ -84,6 +84,7 @@ main (int argc, char* argv[])
 	std::cout << inspect::value(duh) << std::endl;
 
 	std::cout << inspect::value("\tlol\n\x01\"ß") << std::endl;
+	std::wcout << inspect::value(L"\tlol\n\x01\"ß") << std::endl;
 
 	std::cout << inspect::value(true) << std::endl;
 
