@@ -255,6 +255,10 @@ namespace inspect
 		return ss.str();
 	}
 
+	// TODO: implement std::wstring inspection
+	// TODO: implement std::u16string inspection
+	// TODO: implement std::u32string inspection
+
 	template <typename Type>
 	inline
 	typename std::enable_if<is_string<Type>::value, Type>::type
