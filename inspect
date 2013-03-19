@@ -438,7 +438,7 @@ namespace inspect
 		std::stringstream ss(std::stringstream::out);
 
 		ss << "[";
-		for (unsigned i = 0; i < std::extent<Type>::value; i++) {
+		for (size_t i = 0; i < std::extent<Type>::value; i++) {
 			ss << inspect::value(value[i]);
 
 			if (i < std::extent<Type>::value - 1) {
