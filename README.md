@@ -28,6 +28,7 @@ test.cpp output
 [[1, 2], [3, 4]]
 (float*) 0x156
 "\tlol\n\x01\"\xc3\x9f"
+"\tlol\n\u0001\"\u00df"
 true
 ```
 
