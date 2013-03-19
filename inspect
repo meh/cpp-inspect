@@ -18,6 +18,7 @@
 #include <typeinfo>
 #include <string>
 #include <cstring>
+#include <cwctype>
 
 namespace inspect
 {
@@ -255,7 +256,47 @@ namespace inspect
 		return ss.str();
 	}
 
-	// TODO: implement std::wstring inspection
+	template <typename Type>
+	static
+	typename std::enable_if<is_raw_string<Type>::value &&
+		std::is_same<typename is_raw_string<Type>::type, wchar_t>::value, std::wstring>::type
+	value (Type value, size_t length = -1) noexcept
+	{
+		std::wstringstream ss(std::stringstream::out);
+
+		if (length == (size_t) -1) {
+			length = std::wcslen(value);
+		}
+
+		ss << '"';
+		for (size_t i = 0; i < length; i++) {
+			wchar_t ch = value[i];
+
+			if (std::iswprint(ch)) {
+				if (ch == '\\' || ch == '"') {
+					ss << '\\';
+				}
+
+				ss << ch;
+			}
+			else {
+				switch (ch) {
+					case '\t': ss << "\\t"; break;
+					case '\n': ss << "\\n"; break;
+					case '\v': ss << "\\v"; break;
+					case '\f': ss << "\\f"; break;
+					case '\r': ss << "\\r"; break;
+
+					default:
+						ss << "\\u" << std::setfill(L'0') << std::setw(4) << std::hex << (unsigned) ch;
+				}
+			}
+		}
+		ss << '"';
+
+		return ss.str();
+	}
+
 	// TODO: implement std::u16string inspection
 	// TODO: implement std::u32string inspection
 
