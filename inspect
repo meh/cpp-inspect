@@ -14,6 +14,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <limits>
 #include <type_traits>
 #include <typeinfo>
 #include <string>
@@ -315,11 +316,24 @@ namespace inspect
 
 	template <typename Type>
 	static
-	typename std::enable_if<std::is_fundamental<Type>::value, std::string>::type
+	typename std::enable_if<std::is_fundamental<Type>::value &&
+		!std::is_floating_point<Type>::value, std::string>::type
 	value (Type value) noexcept
 	{
 		std::stringstream ss(std::stringstream::out);
 		ss << std::boolalpha << value;
+
+		return ss.str();
+	}
+
+	template <typename Type>
+	static
+	typename std::enable_if<std::is_fundamental<Type>::value &&
+		std::is_floating_point<Type>::value, std::string>::type
+	value (Type value) noexcept
+	{
+		std::stringstream ss(std::stringstream::out);
+		ss << std::setprecision(std::numeric_limits<Type>::digits10) << value;
 
 		return ss.str();
 	}
