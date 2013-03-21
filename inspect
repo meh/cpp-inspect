@@ -21,6 +21,11 @@
 #include <cstring>
 #include <cwctype>
 
+#ifdef _MSC_VER
+#	define noexcept
+#	define constexpr const
+#endif
+
 namespace inspect
 {
 #	if defined(__clang__) || defined(__GNUC__) && !defined(NO_DEMANGLE)
