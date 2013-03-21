@@ -223,10 +223,10 @@ namespace inspect
 		}
 
 		ss << '"';
-		for (int i = 0; i < length; i++) {
+		for (size_t i = 0; i < length; i++) {
 			unsigned char ch = value[i];
 
-			if (std::isprint(ch)) {
+			if (isprint(ch)) {
 				if (ch == '\\' || ch == '"') {
 					ss << '\\';
 				}
