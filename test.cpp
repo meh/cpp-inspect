@@ -76,6 +76,7 @@ main (int argc, char* argv[])
 
 	std::cout << inspect::value(23) << std::endl;
 	std::cout << inspect::value(derp::omg) << std::endl;
+	std::cout << inspect::value(1.04719755) << std::endl;
 
 	int lol[][2] = { { 1, 2 }, { 3, 4 } };
 	std::cout << inspect::value(lol) << std::endl;
