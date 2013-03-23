@@ -95,15 +95,17 @@ main (int argc, char* argv[])
 
 	std::cout << inspect::value(true) << std::endl;
 
-	std::function<void(int)> f = [](int a) { (void) a; };
-	std::cout << inspect::value(f) << std::endl;
+#	ifndef _MSC_VER
+		std::function<void(int)> f = [](int a) { (void) a; };
+		std::cout << inspect::value(f) << std::endl;
 
-	std::cout << inspect::value(func) << std::endl;
+		std::cout << inspect::value(func) << std::endl;
 
-	std::cout << inspect::value(&bar::inspect) << std::endl;
+		std::cout << inspect::value(&bar::inspect) << std::endl;
 
-	auto l = []{};
-	std::cout << inspect::value(l) << std::endl;
+		auto l = []{};
+		std::cout << inspect::value(l) << std::endl;
+#	endif
 
 	return 0;
 }
