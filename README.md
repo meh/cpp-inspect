@@ -19,17 +19,22 @@ test.cpp output
 ---------------
 ```
 "34"
-#<foo:0x7fffebb50360>
+#<foo:0x7ffff5e038c0>
 #<bar: dabbah>
 #<wat: I like trains>
-#<union omg:0x7fffebb50330>
+#<union omg:0x7ffff5e03890>
 23
 #<enum derp: omg>
+1.04719755
 [[1, 2], [3, 4]]
 (float*) 0x156
 "\tlol\n\x01\"\xc3\x9f"
 "\tlol\n\u0001\"\u00df"
 true
+#<function void(int): main::$_0>
+#<function void(float): 0x4023d0>
+#<function std::string(): @bar>
+#<function void(): #<main::$_1: 1>>
 ```
 
 Type name demangling
