@@ -56,6 +56,12 @@ std::ostream& operator << (std::ostream& on, derp v)
 	return on;
 }
 
+void
+func (float a)
+{
+	(void) a;
+}
+
 int
 main (int argc, char* argv[])
 {
@@ -88,6 +94,16 @@ main (int argc, char* argv[])
 	std::wcout << inspect::value(L"\tlol\n\x01\"ß") << std::endl;
 
 	std::cout << inspect::value(true) << std::endl;
+
+	std::function<void(int)> f = [](int a) { (void) a; };
+	std::cout << inspect::value(f) << std::endl;
+
+	std::cout << inspect::value(func) << std::endl;
+
+	std::cout << inspect::value(&bar::inspect) << std::endl;
+
+	auto l = []{};
+	std::cout << inspect::value(l) << std::endl;
 
 	return 0;
 }
