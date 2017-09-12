@@ -23,6 +23,7 @@
 #include <functional>
 #include <cstring>
 #include <cwctype>
+#include <iterator>
 
 #ifdef _MSC_VER
 #	define noexcept
@@ -184,7 +185,31 @@ namespace inspect
 		static constexpr bool value = true;
 	};
 
-	template <typename Type, class Enable = void>
+	template <typename T, typename = void>
+	struct is_iterator
+	{
+		static constexpr bool value = false;
+	};
+
+	template <typename T>
+	struct is_iterator<T, typename std::enable_if<!std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type>
+	{
+		static constexpr bool value = true;
+	};
+
+	template <typename T, typename = void>
+	struct has_iterator
+	{
+		static constexpr bool value = false;
+	};
+
+	template <typename T>
+	struct has_iterator<T, typename std::enable_if<is_iterator<typename T::iterator>::value, void>::type>
+	{
+		static constexpr bool value = true;
+	};
+
+	template <typename Type, class = void>
 	struct has_call_operator;
 
 	template <typename Type>
@@ -255,7 +280,7 @@ namespace inspect
 	struct has_cout : _has_cout::has_cout<Type>
 	{};
 
-	template <typename Type, class Enable = void>
+	template <typename Type, class = void>
 	struct has_to_string_method;
 
 	template <typename Type>
@@ -291,7 +316,7 @@ namespace inspect
 		static constexpr bool value = false;
 	};
 
-	template <typename Type, class Enable = void>
+	template <typename Type, class = void>
 	struct has_inspect_method;
 
 	template <typename Type>
@@ -621,6 +646,7 @@ namespace inspect
 	typename std::enable_if<std::is_class<Type>::value &&
 		!is_functor<Type>::value &&
 		!is_string<Type>::value &&
+		!has_iterator<Type>::value &&
 		!has_to_string_method<Type>::value &&
 		!has_inspect_method<Type>::value &&
 		!has_cout<Type>::value, std::string>::type
@@ -739,6 +765,26 @@ namespace inspect
 				ss << ", ";
 			}
 		}
+		ss << "]";
+
+		return ss.str();
+	}
+
+	// Any iterable value.
+	template <typename Type>
+	static
+	typename std::enable_if<has_iterator<Type>::value &&
+		!is_string<Type>::value, std::string>::type
+	value (Type& value) noexcept
+	{
+		std::stringstream ss(std::stringstream::out);
+
+		ss << "[";
+		for (auto & item : value) {
+			ss << inspect::value(item);
+			ss << ", ";
+		}
+		ss.seekp(-2, std::ios_base::end);
 		ss << "]";
 
 		return ss.str();

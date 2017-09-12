@@ -1,4 +1,5 @@
 #include "inspect"
+#include <vector>
 
 class foo
 {};
@@ -86,6 +87,9 @@ main (int argc, char* argv[])
 
 	int lol[][2] = { { 1, 2 }, { 3, 4 } };
 	std::cout << inspect::value(lol) << std::endl;
+
+	std::vector<int> omg = { 1, 2, 3, 4 };
+	std::cout << inspect::value(omg) << std::endl;
 
 	float* duh = (float*) 342;
 	std::cout << inspect::value(duh) << std::endl;
