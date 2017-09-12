@@ -11,6 +11,7 @@
 #ifndef _INSPECT_H
 #define _INSPECT_H
 
+#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -44,7 +45,7 @@ namespace inspect
 			                                              nullptr, nullptr, &status);
 
 			result = demangled;
-			free(demangled);
+			std::free(demangled);
 
 			if (std::is_enum<Type>::value) {
 				result = "enum " + result;
