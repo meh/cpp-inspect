@@ -34,6 +34,7 @@ namespace inspect
 #	if defined(__clang__) || defined(__GNUC__) && !defined(NO_DEMANGLE)
 #		include <cxxabi.h>
 
+		// Demangle the type with standard abi methods.
 		template <typename Type>
 		static
 		std::string
@@ -42,7 +43,7 @@ namespace inspect
 			std::string result;
 			int         status;
 			char*       demangled = abi::__cxa_demangle(info->name(),
-			                                              nullptr, nullptr, &status);
+			                                            nullptr, nullptr, &status);
 
 			result = demangled;
 			std::free(demangled);
@@ -60,6 +61,7 @@ namespace inspect
 #		include <Windows.h>
 #		include <Dbghelp.h>
 
+		// Demangle a type with the Windows debug helper.
 		template <typename Type>
 		static
 		std::string
@@ -72,6 +74,7 @@ namespace inspect
 			return demangled;
 		}
 #	else
+		// No demangling.
 		template <typename Type>
 		static
 		std::string
@@ -81,6 +84,7 @@ namespace inspect
 		}
 #	endif
 
+	// Any type.
 	template <typename Type>
 	static
 	std::string
@@ -352,6 +356,7 @@ namespace inspect
 			 std::is_same<type, char32_t>::value);
 	};
 
+	// String.
 	template <typename Type>
 	static
 	typename std::enable_if<is_raw_string<Type>::value &&
@@ -395,6 +400,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Wide string.
 	template <typename Type>
 	static
 	typename std::enable_if<is_raw_string<Type>::value &&
@@ -440,6 +446,7 @@ namespace inspect
 	// TODO: implement std::u16string inspection
 	// TODO: implement std::u32string inspection
 
+	// std::string
 	template <typename Type>
 	static
 	typename std::enable_if<is_string<Type>::value, Type>::type
@@ -448,6 +455,7 @@ namespace inspect
 		return inspect::value(value.data(), value.size());
 	}
 
+	// Integer.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_fundamental<Type>::value &&
@@ -460,6 +468,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Float.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_fundamental<Type>::value &&
@@ -472,6 +481,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Pointer.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_pointer<Type>::value &&
@@ -485,6 +495,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Enum with custom std::cout.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_enum<Type>::value &&
@@ -497,6 +508,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Enum.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_enum<Type>::value &&
@@ -510,6 +522,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Union with custom std::cout.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_union<Type>::value &&
@@ -522,6 +535,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Union.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_union<Type>::value &&
@@ -534,6 +548,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Objects without #inspect or #to_string and a custom std::cout.
 	template <typename Type>
 	static
 	typename std::enable_if<!has_to_string_method<Type>::value &&
@@ -547,6 +562,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Any object.
 	template <typename Type>
 	static
 	typename std::enable_if<!has_to_string_method<Type>::value &&
@@ -560,6 +576,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Objects with #to_string but no #inspect.
 	template <typename Type>
 	static
 	typename std::enable_if<has_to_string_method<Type>::value &&
@@ -572,6 +589,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Objects with #inspect.
 	template <typename Type>
 	static
 	typename std::enable_if<has_inspect_method<Type>::value, std::string>::type
@@ -580,6 +598,7 @@ namespace inspect
 		return value.inspect();
 	}
 
+	// Values with a custom std::cout.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_class<Type>::value &&
@@ -596,6 +615,7 @@ namespace inspect
 		return ss.str();
 	}
 
+	// Any object.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_class<Type>::value &&
@@ -609,6 +629,7 @@ namespace inspect
 		return object<Type>(value);
 	}
 
+	// Objects with #to_string.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_class<Type>::value &&
@@ -621,6 +642,7 @@ namespace inspect
 		return object<Type>(value);
 	}
 
+	// Objects with #inspect.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_class<Type>::value &&
@@ -633,6 +655,7 @@ namespace inspect
 	}
 
 #	ifndef _MSC_VER
+		// Function pointer.
 		template <typename Type>
 		static
 		typename std::enable_if<std::is_function<Type>::value, std::string>::type
@@ -647,6 +670,7 @@ namespace inspect
 			return ss.str();
 		}
 
+		// Function pointer to a method.
 		template <typename Type>
 		static
 		typename std::enable_if<std::is_member_function_pointer<Type>::value, std::string>::type
@@ -663,6 +687,7 @@ namespace inspect
 			return ss.str();
 		}
 
+		// std::function
 		template <typename Type>
 		static
 		typename std::enable_if<std::is_class<Type>::value &&
@@ -678,6 +703,7 @@ namespace inspect
 			return ss.str();
 		}
 
+		// Any object with a call operator.
 		template <typename Type>
 		static
 		typename std::enable_if<std::is_class<Type>::value &&
@@ -696,6 +722,7 @@ namespace inspect
 		}
 #	endif
 
+	// Any array that is not a string.
 	template <typename Type>
 	static
 	typename std::enable_if<std::is_array<Type>::value &&
