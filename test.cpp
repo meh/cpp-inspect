@@ -85,14 +85,30 @@ main (int argc, char* argv[])
 	std::cout << inspect::value(derp::omg) << std::endl;
 	std::cout << inspect::value(1.04719755) << std::endl;
 
-	int lol[][2] = { { 1, 2 }, { 3, 4 } };
-	std::cout << inspect::value(lol) << std::endl;
+	{
+		auto value = std::make_tuple(1, 2, 3, 4, 5);
+		std::cout << inspect::value(value) << std::endl;
+	}
 
-	std::vector<int> omg = { 1, 2, 3, 4 };
-	std::cout << inspect::value(omg) << std::endl;
+	{
+		auto value = std::make_pair(1, 2);
+		std::cout << inspect::value(value) << std::endl;
+	}
 
-	float* duh = (float*) 342;
-	std::cout << inspect::value(duh) << std::endl;
+	{
+		int value[][2] = { { 1, 2 }, { 3, 4 } };
+		std::cout << inspect::value(value) << std::endl;
+	}
+
+	{
+		std::vector<int> value = { 1, 2, 3, 4 };
+		std::cout << inspect::value(value) << std::endl;
+	}
+
+	{
+		float* value = (float*) 342;
+		std::cout << inspect::value(value) << std::endl;
+	}
 
 	std::cout << inspect::value("\tlol\n\x01\"ß") << std::endl;
 	std::wcout << inspect::value(L"\tlol\n\x01\"ß") << std::endl;

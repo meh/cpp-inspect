@@ -224,6 +224,24 @@ namespace inspect
 		static constexpr bool value = true;
 	};
 
+	template <typename... T>
+	struct is_tuple
+	{
+		static constexpr bool value = false;
+	};
+
+	template <typename... Types>
+	struct is_tuple<std::tuple<Types...>>
+	{
+		static constexpr bool value = true;
+	};
+
+	template <typename First, typename Second>
+	struct is_tuple<std::pair<First, Second>>
+	{
+		static constexpr bool value = true;
+	};
+
 	template <typename Type, class = void>
 	struct has_call_operator;
 
@@ -661,6 +679,7 @@ namespace inspect
 	typename std::enable_if<std::is_class<Type>::value &&
 		!is_functor<Type>::value &&
 		!is_string<Type>::value &&
+		!is_tuple<Type>::value &&
 		!has_iterator<Type>::value &&
 		!has_to_string_method<Type>::value &&
 		!has_inspect_method<Type>::value &&
@@ -807,6 +826,54 @@ namespace inspect
 		}
 		ss.seekp(-2, std::ios_base::end);
 		ss << "]";
+
+		return ss.str();
+	}
+
+	// Pair.
+	template <typename First, typename Second>
+	static
+	std::string
+	value (std::pair<First, Second>& value) noexcept
+	{
+		std::stringstream ss(std::stringstream::out);
+
+		ss << "(";
+		ss << inspect::value(value.first) << ", ";
+		ss << inspect::value(value.second);
+		ss << ")";
+
+		return ss.str();
+	}
+
+	template <std::size_t I = 0, typename... Types>
+	static inline
+	typename std::enable_if<I == sizeof...(Types), void>::type
+	_tuple(std::ostream& out, std::tuple<Types...>& t)
+	{
+	}
+
+	template <std::size_t I = 0, typename... Types>
+	static inline
+	typename std::enable_if<I<sizeof...(Types), void>::type
+	_tuple(std::ostream& out, std::tuple<Types...>& t)
+	{
+		out << std::get<I>(t) << ", ";
+		_tuple<I + 1, Types...>(out, t);
+	}	
+
+	// Tuple.
+	template <typename... Types>
+	static
+	std::string
+	value (std::tuple<Types...>& value) noexcept
+	{
+		std::stringstream ss(std::stringstream::out);
+
+		ss << "(";
+		_tuple(ss, value);
+		ss.seekp(-2, std::ios_base::end);
+		ss << ")";
 
 		return ss.str();
 	}
