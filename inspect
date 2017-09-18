@@ -17,9 +17,6 @@
 #include <sstream>
 #include <limits>
 #include <type_traits>
-#if defined(_GXX_RTTI) || defined(_CPPRTTI)
-#include <typeinfo>
-#endif
 #include <utility>
 #include <string>
 #include <functional>
@@ -37,8 +34,14 @@
 #	define INSPECT_DEMANGLE 1
 #endif
 
-#if defined(_GXX_RTTI) || defined(_CPPRTTI) || (defined(__clang__) && __has_feature(cxx_rtti))
+#if defined(_GXX_RTTI) || defined(_CPPRTTI)
 #	define _INSPECT_HAS_RTTI 1
+#	include <typeinfo>
+#elif defined(__clang__)
+#	if __has_feature(cxx_rtti)
+#		define _INSPECT_HAS_RTTI 1
+#		include <typeinfo>
+#	endif
 #endif
 
 namespace inspect
@@ -105,7 +108,7 @@ namespace inspect
 #		if defined(_INSPECT_HAS_RTTI)
 			return type<Type>(&typeid(Type));
 #		else
-			return "<unknown type>";
+			return "?";
 #		endif
 	}
 
@@ -128,10 +131,14 @@ namespace inspect
 		function (void)
 		{
 			std::string string = type<Function>();
+			auto        pos    = string.find("(");
 
-			size_t pos = string.find("(");
-
-			return std::make_tuple(string.substr(0, pos - 1), string.substr(pos), "");
+			if (pos != std::string::npos) {
+				return std::make_tuple(string.substr(0, pos - 1), string.substr(pos), "");
+			}
+			else {
+				return std::make_tuple("?", "?", "");
+			}
 		}
 
 		template <typename Function>
@@ -142,26 +149,32 @@ namespace inspect
 		{
 			std::string string = type<Function>();
 
-			std::string return_value;
+			std::string return_value = "?";
 			{
-				size_t pos = string.find("(");
+				auto pos = string.find("(");
 
-				return_value = string.substr(0, pos - 1);
+				if (pos != std::string::npos) {
+					return_value = string.substr(0, pos - 1);
+				}
 			}
 
-			std::string klass;
+			std::string klass = "?";
 			{
-				size_t pos  = string.find("(");
-				size_t pos2 = string.find(":", pos);
+				auto pos  = string.find("(");
+				auto pos2 = string.find(":", pos);
 
-				klass = string.substr(pos + 1, pos2 - pos - 1);
+				if (pos != std::string::npos) {
+					klass = string.substr(pos + 1, pos2 - pos - 1);
+				}
 			}
 
-			std::string arguments;
+			std::string arguments = "?";
 			{
-				size_t pos = string.find(")");
+				auto pos = string.find(")");
 
-				arguments = string.substr(pos + 1);
+				if (pos != std::string::npos) {
+					arguments = string.substr(pos + 1);
+				}
 			}
 
 			return std::make_tuple(return_value, arguments, klass);
@@ -175,16 +188,21 @@ namespace inspect
 		{
 			std::string string = type<typename function_traits<Function>::pointer>();
 			{
-				size_t pos = string.find("(*)");
+				auto pos = string.find("(*)");
 
 				if (pos != std::string::npos) {
 					string.replace(pos, 3, "");
 				}
 			}
 
-			size_t pos = string.find("(");
+			auto pos = string.find("(");
 
-			return std::make_tuple(string.substr(0, pos - 1), string.substr(pos), "");
+			if (pos != std::string::npos) {
+				return std::make_tuple(string.substr(0, pos - 1), string.substr(pos), "");
+			}
+			else {
+				return std::make_tuple("?", "?", "");
+			}
 		}
 #	endif
 
