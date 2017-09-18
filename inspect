@@ -17,22 +17,33 @@
 #include <sstream>
 #include <limits>
 #include <type_traits>
+#if defined(_GXX_RTTI) || defined(_CPPRTTI)
 #include <typeinfo>
+#endif
 #include <utility>
 #include <string>
 #include <functional>
 #include <cstring>
 #include <cwctype>
 #include <iterator>
+#include <tuple>
 
 #ifdef _MSC_VER
 #	define noexcept
 #	define constexpr const
 #endif
 
+#ifndef INSPECT_DEMANGLE
+#	define INSPECT_DEMANGLE 1
+#endif
+
+#if defined(_GXX_RTTI) || defined(_CPPRTTI) || (defined(__clang__) && __has_feature(cxx_rtti))
+#	define _INSPECT_HAS_RTTI 1
+#endif
+
 namespace inspect
 {
-#	if defined(__clang__) || defined(__GNUC__) && !defined(NO_DEMANGLE)
+#	if defined(_INSPECT_HAS_RTTI) && defined(INSPECT_DEMANGLE) && (defined(__clang__) || defined(__GNUC__))
 #		include <cxxabi.h>
 
 		// Demangle the type with standard abi methods.
@@ -58,7 +69,7 @@ namespace inspect
 
 			return result;
 		}
-#	elif defined(_MSC_VER) && !defined(NO_DEMANGLE)
+#	elif defined(_INSPECT_HAS_RTTI) && defined(INSPECT_DEMANGLE) && defined(_MSC_VER)
 #		include <Windows.h>
 #		include <Dbghelp.h>
 
@@ -74,7 +85,7 @@ namespace inspect
 
 			return demangled;
 		}
-#	else
+#	elif defined(_INSPECT_HAS_RTTI)
 		// No demangling.
 		template <typename Type>
 		static
@@ -91,7 +102,11 @@ namespace inspect
 	std::string
 	type (void) noexcept
 	{
-		return type<Type>(&typeid(Type));
+#		if defined(_INSPECT_HAS_RTTI)
+			return type<Type>(&typeid(Type));
+#		else
+			return "<unknown type>";
+#		endif
 	}
 
 #	ifndef _MSC_VER
@@ -723,8 +738,14 @@ namespace inspect
 			auto strings = function<Type>();
 
 			std::stringstream ss(std::stringstream::out);
-			ss << "#<function " << std::get<0>(strings) << std::get<1>(strings) << ": " <<
-				type<void>(&value.target_type()) << ">";
+
+			ss << "#<function " << std::get<0>(strings) << std::get<1>(strings);
+
+#			if defined(_INSPECT_HAS_RTTI)
+				ss << ": " << type<void>(&value.target_type());
+#			endif
+				
+			ss << ">";
 
 			return ss.str();
 		}
