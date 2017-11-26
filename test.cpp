@@ -64,7 +64,7 @@ func (float a)
 }
 
 int
-main (int argc, char* argv[])
+main (void)
 {
 	std::string str = "34";
 	std::cout << inspect::value(str) << std::endl;
